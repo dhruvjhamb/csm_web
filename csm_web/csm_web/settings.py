@@ -101,7 +101,7 @@ DATABASES = {
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     },
     "pg": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": "csm_web",
         "USER": "csm_web",
         "PASSWORD": "",

@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import F, Q
+from django.db.models.constraints import CheckConstraint
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -43,6 +45,8 @@ class Attendance(models.Model):
 
     class Meta:
         unique_together = ("section", "week_start", "attendee")
+        # TODO
+        # constraint = CheckConstraint(check=Q(week_start__day_of_week=0), name="day_of_week_monday")
 
 
 class Course(models.Model):
@@ -101,6 +105,25 @@ class Profile(ActivatableModel):
 
     def __str__(self):
         return f"{self.course.name} {self.role} - {self.name}"
+
+    class Meta:
+        constraints = (
+            CheckConstraint(
+                # all students must have section.leader = leader
+                check=~Q(role="ST") | Q(section__leader=F("leader")),
+                name="student_section_leader_eq",
+            ),
+            CheckConstraint(
+                # any profile with a section must have the same course
+                check=Q(section__isnull=True) | Q(section__course=F("course")),
+                name="section_course_eq",
+            ),
+            CheckConstraint(
+                # any profile with a leader must have that leader be in the same course
+                check=Q(leader__isnull=True) | Q(leader__course=F("course")),
+                name="leader_course_eq",
+            ),
+        )
 
 
 class Section(models.Model):
