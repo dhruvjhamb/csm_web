@@ -13,13 +13,11 @@ from rest_framework.exceptions import PermissionDenied
 from .models import Matching
 from .serializers import MatchingSerializer
 
-# Create your views here.
-
 # Matching
 
 
 @api_view(http_method_names=["POST"])
-def update(request, pk):
+def update_matching(request, pk):
 
     matching = get_object_or_404(Matching, pk=pk)
 
@@ -64,6 +62,14 @@ class MatchingRoomList(generics.ListAPIView):
         return Matching.objects.filter(active=True).filter(
             room_id=self.kwargs["room_id"]
         )
+
+
+class MatchingList(generics.ListAPIView):
+
+    serializer_class = MatchingSerializer
+
+    def get_queryset(self):
+        return Matching.objects.all()
 
 
 class DeleteMatching(generics.DestroyAPIView):
